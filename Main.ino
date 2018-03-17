@@ -222,9 +222,9 @@ void thingspeak()
   int mm = item2.toInt();   // convert string minute to int
   int ss = item3.toInt();   // convert string second to int
 
-  if (mm == 00  || mm == 30)    // check time for minute equals 00 or 30
+  if (mm % 30 == 0)  // check time for minute equals 00 or 30
   {
-    if (ss >= 00 && ss <= 30)   // check time for second equals 00 or 15
+    if (ss <= 30)   // check time for second equals 00 or 15
     {
       if (client.connect(thingSpeakAddress, 80))
       {
@@ -242,7 +242,7 @@ void thingspeak()
     }
   }
 
-  delay(1000);
+  delay(5000);
 
 }
 
