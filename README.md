@@ -6,6 +6,7 @@ Name: A Development of Water Quality Monitoring System Using IoT (การพ�
 
 Controller
 - NodeMCU Dev kit V.1 (Ref: http://thaieasyelec.com/dev-board/nodemcu-development-kit-v2-detail.html)
+
 Sensors
 - Analog pH Meter Pro (Ref: http://thaieasyelec.com/products/sensors/ph-d-o-orp/analog-ph-meter-pro-detail.html)
 - Temperature Sensor - Waterproof (DS18B20) [เซนเซอร์ตรวจวัดอุณหภูมิในน้ำ] (Ref: http://thaieasyelec.com/products/sensors/humidity-temperature/temperature-sensor-waterproof-ds18b20-detail.html)
