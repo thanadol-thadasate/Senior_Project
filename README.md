@@ -15,9 +15,12 @@ Sensors
 
 IDE
 - Arduino IDE
+
 Cloud
 - ThingSpeak
+
 Notify
 - Line Notify
+
 Visualize
 - Blynk (Mobile Application)
