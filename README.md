@@ -2,7 +2,12 @@ Senior Project (Srinakharinwirot University, The Faculty of Science, Computer Sc
 
 Name: A Development of Water Quality Monitoring System Using IoT (การพัฒนาระบบตรวจสอบคุณภาพน้ำด้วยเทคโนโลยี IoT)
 
-Research Scope (ขอบเขตการวิจัย)
+Purposes of Research (วัตถุประสงค์)
+1. เพื่อให้ประชาชนสามารถตรวจสอบคุณภาพน้ำในแหล่งน้ำบริเวณที่พักอาศัยของตนได้ด้วยตัวเอง 
+2. พัฒนาระบบตรวจสอบคุณภาพน้ำที่ส่งข้อมูลแบบไร้สายโดยใช้เทคโนโลยี IoT
+3. เพื่อเรียนรู้การทำงานของ pH Sensor, Temperature Sensor, Turbidity Sensor และไมโครคอนโทรลเลอร์ NodeMCU
+
+Scope of Research (ขอบเขตของงานวิจัย)
 1. สามารถตรวจสอบค่าความเป็นกรด-เบส อุณหภูมิ และความขุ่นของน้ำได้
 2. เก็บรวบรวมข้อมูลที่ได้จากการตรวจสอบคุณภาพน้ำไว้ที่ Cloud
 3. แสดงผลการตรวจสอบแบบ Real-Time ไปยังโทรศัพท์มือถือผ่านแอปพลิเคชัน Blynk
