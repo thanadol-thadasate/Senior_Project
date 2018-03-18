@@ -1,0 +1,42 @@
+
+Exception 29: StoreProhibited: A store referenced a page mapped with an attribute that does not permit stores
+Decoding 36 results
+0x4020f9be: memset at /Users/igrokhotkov/e/newlib-xtensa/xtensa-lx106-elf/newlib/libc/machine/xtensa/../../../../.././newlib/libc/machine/xtensa/memset.S line 133
+0x4021c842: more_comps at crypto/bigint.c line 672
+0x4021ca3c: alloc at crypto/bigint.c line 672
+0x40100670: _umm_realloc at C:\Users\Seion\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.4.1\cores\esp8266\umm_malloc/umm_malloc.c line 1641
+:  (inlined by) realloc at C:\Users\Seion\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.4.1\cores\esp8266\umm_malloc/umm_malloc.c line 1715
+0x4021cd55: regular_multiply at crypto/bigint.c line 672
+0x40208008: optimistic_yield at C:\Users\Seion\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.4.1\cores\esp8266/core_esp8266_main.cpp line 57
+0x4021d88f: bi_barrett at crypto/bigint.c line 1289
+0x4021dae4: bi_mod_power at crypto/bigint.c line 1414
+0x4021c8e8: trim at crypto/bigint.c line 672
+0x4021ec6d: RSA_public at crypto/rsa.c line 254
+:  (inlined by) RSA_encrypt at crypto/rsa.c line 288
+0x40219968: send_client_key_xchg at ssl/tls1_clnt.c line 409
+0x40219dfd: do_clnt_handshake at ssl/tls1_clnt.c line 123
+0x40207fc8: __yield at C:\Users\Seion\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.4.1\cores\esp8266/core_esp8266_main.cpp line 57
+0x40219770: do_handshake at ssl/tls1.c line 2007
+:  (inlined by) basic_read at ssl/tls1.c line 1483
+0x40219b4c: do_client_connect at ssl/tls1_clnt.c line 168
+0x401004d8: malloc at C:\Users\Seion\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.4.1\cores\esp8266\umm_malloc/umm_malloc.c line 1668
+0x40205400: SSLContext::_delete_shared_SSL(SSL_*) at C:\Users\Seion\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.4.1\libraries\ESP8266WiFi\src/WiFiClientSecure.cpp line 310 (discriminator 1)
+0x402198d8: ssl_read at ssl/tls1.c line 2007
+0x4010500c: ets_timer_arm_new at ?? line ?
+0x40205be1: SSLContext::connect(ClientContext*, char const*, unsigned int) at C:\Users\Seion\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.4.1\libraries\ESP8266WiFi\src/WiFiClientSecure.cpp line 310 (discriminator 1)
+0x40207e60: operator new(unsigned int) at C:\Users\Seion\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.4.1\cores\esp8266/abi.cpp line 84
+0x40205c20: std::__shared_ptr ::operator=(std::__shared_ptr &&) at C:\Users\Seion\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.4.1\libraries\ESP8266WiFi\src/WiFiClientSecure.cpp line 310 (discriminator 1)
+0x40205e2f: WiFiClientSecure::_connectSSL(char const*) at C:\Users\Seion\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.4.1\libraries\ESP8266WiFi\src/WiFiClientSecure.cpp line 310 (discriminator 1)
+0x40205ed5: WiFiClientSecure::connect(char const*, unsigned short) at C:\Users\Seion\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.4.1\libraries\ESP8266WiFi\src/WiFiClientSecure.cpp line 310 (discriminator 1)
+0x401072a8: putchar at ?? line ?
+0x401072a8: putchar at ?? line ?
+0x40203d5f: Line_Notify(String, String) at D:\Senior_Project\Main/Main.ino line 255
+0x401071b8: putchar at ?? line ?
+0x4020795f: String::changeBuffer(unsigned int) at C:\Users\Seion\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.4.1\cores\esp8266/WString.cpp line 761
+0x402079dd: String::copy(char const*, unsigned int) at C:\Users\Seion\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.4.1\cores\esp8266/WString.cpp line 761
+0x40207a9c: String::operator=(String const&) at C:\Users\Seion\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.4.1\cores\esp8266/WString.cpp line 761
+0x402041a2: temperature() at D:\Senior_Project\Main/Main.ino line 165
+0x402017fb: delay at C:\Users\Seion\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.4.1\cores\esp8266/core_esp8266_wiring.c line 51
+0x402043b0: loop at D:\Senior_Project\Main/Main.ino line 82
+0x40207f9c: loop_wrapper at C:\Users\Seion\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.4.1\cores\esp8266/core_esp8266_main.cpp line 57
+0x40100710: cont_norm at C:\Users\Seion\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.4.1\cores\esp8266/cont.S line 109
