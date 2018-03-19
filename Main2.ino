@@ -178,14 +178,9 @@ void turbidity()
   Serial.print(ntu);
   Serial.println(" ntu");
 
-  if (ntu == 1000)
+  if (ntu >= 1000)
   {
-    String txt = "Turbidity: " + (String)ntu + " --> น้ำเริ่มขุ่น";
-    Line_Notify(LINE_TOKEN, txt);
-  }
-  else if (ntu > 1000)
-  {
-    String txt = "Turbidity: " + (String)ntu + " --> น้ำขุ่นมาก อยู่ในเกณฑ์อันตราย";
+    String txt = "Turbidity: " + (String)ntu + " --> น้ำขุ่น";
     Line_Notify(LINE_TOKEN, txt);
   }
 
