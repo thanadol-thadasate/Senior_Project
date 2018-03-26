@@ -17,17 +17,18 @@
 // Data wire is plugged into pin 4 on the NodeMCU
 #define ONE_WIRE_BUS 2
 
-char ssid[] = "Lenovo Z2 Plus";    // ssid ของ Wi-Fi ที่เราต้องการเชื่อมต่อ
-char pass[] = "31stjuly";          // password ของ Wi-Fi ที่เราต้องการเชื่อมต่อ
+BlynkTimer timer;
 
 // You should get Auth Token in the Blynk App.
 // Go to the Project Settings (nut icon).
-char auth[] = "c42219ce8e4d4e5e9e2187d1dd076358";
+char auth[] = "10a79685a54f444c83af892a08a7864c";
 
-BlynkTimer timer;
+char ssid[] = "Lenovo Z2 Plus";    // ssid ของ Wi-Fi ที่เราต้องการเชื่อมต่อ
+char pass[] = "31stjuly";          // password ของ Wi-Fi ที่เราต้องการเชื่อมต่อ
+bool Connected2Blynk = false;
 
 char thingSpeakAddress[] = "api.thingspeak.com";
-String writeAPIKey = "D3DHCZC22G7068VS";    // เอา Write API Key ของเรามาใส่
+String writeAPIKey = "0O3WMXHUJX4YS698";    // เอา Write API Key ของเรามาใส่
 WiFiClient client;                          // เรียกใช้การเชื่อมต่อกับ Wi-Fi
 
 String LINE_TOKEN = "Ihqmiws8oF4ntECpYWv7YG6UblWJLF69Dlv0mWNN1vN";
@@ -44,7 +45,6 @@ OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 
 unsigned long int avgValue;
-float b;
 int buf[10], tmp;
 float phValue;
 
@@ -62,17 +62,30 @@ void setup(void)
 
   // start serial port
   Serial.begin(115200);
-  pinMode(A0, OUTPUT);
   // Start up the library
   Blynk.begin(auth, ssid, pass);
-  setSyncInterval(15);
-  timer.setInterval(15000L, blynk_write);
+  /*setSyncInterval(15);
+    timer.setInterval(15000L, blynk_write);*/
+  Blynk.connect(3333);  // timeout set to 10 seconds and then continue without Blynk
+  while (Blynk.connect() == false) {
+    // Wait until connected
+    yield();
+  }
+  Serial.println("Connected to Blynk server");
+  timer.setInterval(15000L, blynk_write); // check if still connected every 11 second
   configTime(timezone, dst, "pool.ntp.org", "time.nist.gov"); // ดึงเวลาจาก NTP Server
   sensors.begin();
   Wire.begin(4, 5);
   ads1115.setGain(GAIN_ONE); // 1x gain   +/- 4.096V  1 bit = 0.125mV // การตั้งค่า Gain = 1x หรือช่วงวัด +/- 4.096V ความละเอียด 0.125mV/bit
   ads1115.begin();
 
+}
+
+void blynk_write()
+{
+  Blynk.virtualWrite(V1, phValue);
+  Blynk.virtualWrite(V2, temp);
+  Blynk.virtualWrite(V3, ntu);
 }
 
 void loop()
@@ -82,7 +95,9 @@ void loop()
   temperature();
   turbidity();
   thingspeak();
-  Blynk.run();
+  if (Connected2Blynk) {
+    Blynk.run();
+  }
   timer.run();
 
 }
@@ -113,7 +128,7 @@ void pH()
   avgValue = 0;
   for (int i = 2; i < 8; i++)                       // take the average value of 6 center sample
     avgValue += buf[i];
-  phValue = (float)avgValue * 3.3 / 27000.0 / 6;    // convert the analog into millivolt
+  phValue = (float)avgValue * 3.3 / 23000.0 / 6;    // convert the analog into millivolt
   phValue = 3.5 * phValue;                          // convert the millivolt into pH value
   Serial.println(" ");
   Serial.print("   pH: ");
@@ -132,7 +147,6 @@ void pH()
   }
 
   delay(1000);
-
 }
 
 void temperature()
@@ -146,20 +160,20 @@ void temperature()
 
   Serial.print("        Temperature is: ");
 
-  tmp = sensors.getTempCByIndex(0);
+  temp = sensors.getTempCByIndex(0);
 
-  Serial.println(tmp, 2);   // Why "byIndex"?
+  Serial.println(temp, 2);   // Why "byIndex"?
   // You can have more than one DS18B20 on the same bus.
   // 0 refers to the first IC on the wire
 
-  if (tmp < 23.0)
+  if (temp < 23.0)
   {
-    String txt = "Temperature: " + (String)tmp + " --> น้ำเย็นเกินไป";
+    String txt = "Temperature: " + (String)temp + " --> น้ำเย็นเกินไป";
     Line_Notify(LINE_TOKEN, txt);
   }
-  else if (tmp > 32.0)
+  else if (temp > 32.0)
   {
-    String txt = "Temperature: " + (String)tmp + " --> น้ำร้อนเกินไป";
+    String txt = "Temperature: " + (String)temp + " --> น้ำร้อนเกินไป";
     Line_Notify(LINE_TOKEN, txt);
   }
 
@@ -189,10 +203,10 @@ void turbidity()
 
 void thingspeak()
 {
-  String pH = (String)phValue;
-  String temp = (String)tmp;   // เนื่องจาก temp เป็น float ซึ่งจะส่งค่าไม่ได้ เราจึกต้องแปลงเป็น String ก่อนค่ะ
-  String turb = (String)ntu;
-  String data = "field1=" + pH + "&field2=" + temp + "&field3=" + turb;   // ข้อมูล String ที่เราจะส่งค่าไปยัง ThingSpeak ค่ะ
+  String Msg_pH = (String)phValue;
+  String Msg_temp = (String)temp;   // เนื่องจาก temp เป็น float ซึ่งจะส่งค่าไม่ได้ เราจึกต้องแปลงเป็น String ก่อนค่ะ
+  String Msg_turb = (String)ntu;
+  String data = "field1=" + Msg_pH + "&field2=" + Msg_temp + "&field3=" + Msg_turb;   // ข้อมูล String ที่เราจะส่งค่าไปยัง ThingSpeak ค่ะ
 
   time_t now = time(nullptr);
   struct tm* p_tm = localtime(&now);    // ไปรับค่าเวลา
@@ -201,7 +215,7 @@ void thingspeak()
 
   if (num_min % 30 == 0)   // check time for minute equals 00 or 30
   {
-    if (num_sec <= 30)     // check time for second less than 30
+    if (num_sec >= 40)     // check time for second less than 30
     {
       if (client.connect(thingSpeakAddress, 80))
       {
@@ -222,13 +236,6 @@ void thingspeak()
   for (int i = 0; i <= 1500; i++) {
     delay(10);
   }
-}
-
-void blynk_write()
-{
-  Blynk.virtualWrite(V1, phValue);
-  Blynk.virtualWrite(V2, tmp);
-  Blynk.virtualWrite(V3, ntu);
 }
 
 void Line_Notify(String LINE_Token, String message)
@@ -254,7 +261,7 @@ void Line_Notify(String LINE_Token, String message)
 
   lineclient.print(req);
 
-  delay(1000);
+  delay(3000);
 
   while (client.connected())
   {
