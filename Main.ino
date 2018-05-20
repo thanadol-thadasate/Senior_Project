@@ -9,8 +9,6 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-#include <ThingSpeak.h>
-
 #include <Time.h>
 #include <TimeLib.h>
 
@@ -49,15 +47,16 @@ OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 
 unsigned long int avgValue;
-int buf[10], tmp;
+int buf[10], buff[10], tmp;
 float phValue;
 
 float temp;
 
 int sensorValue;
 float voltage;
-float mapv;
+float mapV;
 float ntu;
+float turbi;
 
 int timezone = 7 * 3600;  // ตั้งค่า TimeZone ตามเวลาประเทศไทย
 int dst = 0;  // กำหนดค่า Date Swing Time
@@ -76,8 +75,9 @@ void setup(void)
   Blynk.connect(3333);  // timeout set to 10 seconds and then continue without Blynk
   while (Blynk.connect() == false) {
     // Wait until connected
+    delay(10);
   }
-  timer.setInterval(11000L, blynk_write); // check if still connected every 11 second
+  timer.setInterval(30000L, blynk_write); // check if still connected every 15 second
   configTime(timezone, dst, "pool.ntp.org", "time.nist.gov"); // ดึงเวลาจาก NTP Server
   sensors.begin();
   Wire.begin(4, 5);
@@ -106,7 +106,7 @@ void blynk_write()
   delay(20);
   Blynk.virtualWrite(V2, temp);
   delay(20);
-  Blynk.virtualWrite(V3, ntu);
+  Blynk.virtualWrite(V3, turbi);
   delay(20);
   ESP.wdtFeed();
 }
@@ -121,13 +121,11 @@ void loop()
 
 void pH()
 {
-
   for (int i = 0; i < 10; i++)              // Get 10 sample value from the sensor for smooth the value
   {
     adc3 = ads1115.readADC_SingleEnded(3);  // address GND (0x048) pin 3
     buf[i] = adc3;
     delay(10);
-    yield();
   }
 
   for (int i = 0; i < 9; i++)               // sort the analog from small to large
@@ -144,10 +142,10 @@ void pH()
   }
 
   avgValue = 0;
-  for (int i = 2; i < 8; i++)                       // take the average value of 6 center sample
+  for (int i = 2; i < 8; i++)                           // take the average value of 6 center sample
     avgValue += buf[i];
-  phValue = (float)avgValue * 3.3 / 23000.0 / 6;    // convert the analog into millivolt
-  phValue = 3.5 * phValue;                          // convert the millivolt into pH value
+  phValue = ((float)avgValue * (3.3 / 21500.0)) / 6;    // convert the analog into millivolt
+  phValue = 3.5 * phValue;                              // convert the millivolt into pH value
 
   if (phValue < 5.0)
   {
@@ -187,14 +185,36 @@ void temperature()
 
 void turbidity()
 {
-  sensorValue = analogRead(A0);             // read the input on analog pin 0:
-  voltage = sensorValue * (5.0 / 1024.0);   // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 5V):
-  mapv = mapf(voltage, 0, 5, 4.2, 2.5);
-  ntu = (-1120.4 * pow(mapv, 2)) + (5742.3 * mapv) - 4352.9;
-
-  if (ntu >= 1000)
+  for (int i = 0; i < 10; i++)              // Get 10 sample value from the sensor for smooth the value
   {
-    String txt = "Turbidity: " + (String)ntu + " is Dirty.";
+    buff[i] = analogRead(A0);                // read the input on analog pin 0:
+    delay(10);
+  }
+
+  for (int i = 0; i < 9; i++)               // sort the analog from small to large
+  {
+    for (int j = i + 1; j < 10; j++)
+    {
+      if (buff[i] > buff[j])
+      {
+        tmp = buff[i];
+        buff[i] = buff[j];
+        buff[j] = tmp;
+      }
+    }
+  }
+
+  sensorValue = 0;
+  for (int i = 2; i < 8; i++)                      // take the average value of 6 center sample
+    sensorValue += buff[i];
+  voltage = (sensorValue * (5.0 / 1024.0)) / 6;
+  mapV = mapf(voltage, 0, 5, 4.2, 2.5);
+  ntu = (-1120.4 * pow(mapV, 2)) + (5742.3 * mapV) - 4352.9;
+  turbi = mapf(ntu, 0, 3000, 0, 100);
+
+  if (turbi >= 80)
+  {
+    String txt = "Turbidity: " + (String)turbi + " is Dirty.";
     Line_Notify(LINE_TOKEN, txt);
   }
 }
@@ -203,17 +223,17 @@ void thingspeak()
 {
   Msg_pH = (String)phValue;
   Msg_temp = (String)temp;   // เนื่องจาก temp เป็น float ซึ่งจะส่งค่าไม่ได้ เราจึกต้องแปลงเป็น String ก่อนค่ะ
-  Msg_turb = (String)ntu;
+  Msg_turb = (String)turbi;
   data = "field1=" + Msg_pH + "&field2=" + Msg_temp + "&field3=" + Msg_turb;   // ข้อมูล String ที่เราจะส่งค่าไปยัง ThingSpeak ค่ะ
 
   time_t now = time(nullptr);
-  tm* p_tm = localtime(&now);    // ไปรับค่าเวลา
+  tm* p_tm = localtime(&now);       // ไปรับค่าเวลา
   num_min = p_tm->tm_min;           // เก็บค่านาทีมาไว้ในตัวแปร NUM
   num_sec = p_tm->tm_sec;           // เก็บค่าวินาทีมาไว้ในตัวแปร NUM
 
   if (num_min % 30 == 0)   // check time for minute equals 00 or 30
   {
-    if (num_sec <= 20)     // check time for second less than 20
+    if (num_sec <= 60)     // check time for second less than 30
     {
       if (client.connect(thingSpeakAddress, 80))
       {
